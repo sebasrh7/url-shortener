@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import MongoStore from "connect-mongo";
 import bodyParser from "body-parser";
 import router from "./routes/routes.js";
 import morgan from "morgan";
@@ -13,16 +14,41 @@ import User from "./models/User.js";
 // Load environment variables
 dotenv.config();
 
+// Connect to MongoDB
+const uri = process.env.DATABASE_URL;
+mongoose
+  .connect(uri)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error(err));
+
 // Initialize Express
 const app = express();
 
 // Session configuration
-const sessionConfig = {
-  secret: process.env.SESSION_SECRET,
-  resave: true, // Forces the session to be saved back to the session store
-  saveUninitialized: true, // Forces a session that is "uninitialized" to be saved to the store
-};
-app.use(session(sessionConfig));
+// const sessionConfig = {
+//   secret: process.env.SESSION_SECRET,
+//   cookie: {
+//     maxAge: 1000 * 60 * 60 * 24, // 24 hours
+//   },
+//   resave: false,
+//   saveUninitialized: false,
+//   store: MongoStore.create({ mongoUrl: uri }),
+// };
+
+// app.use(session(sessionConfig));
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      name: "cookie",
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      secure: false,
+    },
+  })
+);
 
 // Passport configuration
 const strategy = new Auth0Strategy(
@@ -46,8 +72,11 @@ const strategy = new Auth0Strategy(
           date: new Date(),
         });
         await newUser.save();
+
         return done(null, newUser);
       }
+
+      return done(null, user);
     } catch (error) {
       return done(error, null);
     }
@@ -73,8 +102,7 @@ app.use(passport.session());
 
 // Cors
 const corsOptions = {
-  origin: ["http://localhost:3000", "http://127.0.0.1:5173", "*"],
-  optionsSuccessStatus: 200,
+  origin: ["http://127.0.0.1:5173", "http://localhost:3000"],
 };
 app.use(cors(corsOptions));
 
@@ -83,13 +111,6 @@ app.use(morgan("dev"));
 
 // Bodyparser Middleware
 app.use(bodyParser.json());
-
-// Connect to MongoDB
-const uri = process.env.DATABASE_URL;
-mongoose
-  .connect(uri)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error(err));
 
 // Routes
 app.use(router);
