@@ -1,14 +1,13 @@
 import express from "express";
 import mongoose from "mongoose";
-import MongoStore from "connect-mongo";
 import bodyParser from "body-parser";
 import router from "./routes/routes.js";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
-import session from "express-session";
 import passport from "passport";
 import Auth0Strategy from "passport-auth0";
+import session from "express-session";
 import User from "./models/User.js";
 
 // Load environment variables
@@ -24,31 +23,27 @@ mongoose
 // Initialize Express
 const app = express();
 
-// Session configuration
-// const sessionConfig = {
-//   secret: process.env.SESSION_SECRET,
-//   cookie: {
-//     maxAge: 1000 * 60 * 60 * 24, // 24 hours
-//   },
-//   resave: false,
-//   saveUninitialized: false,
-//   store: MongoStore.create({ mongoUrl: uri }),
-// };
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+);
 
-// app.use(session(sessionConfig));
-
+// Express session middleware
 app.use(
   session({
+    key: "user_sid",
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: {
-      name: "cookie",
-      maxAge: 1000 * 60 * 60 * 24, // 24 hours
-      secure: false,
-    },
   })
 );
+
+// Passport middleware for authentication and session management with Auth0
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Passport configuration
 const strategy = new Auth0Strategy(
@@ -84,29 +79,15 @@ const strategy = new Auth0Strategy(
 );
 passport.use(strategy);
 
+// Serialize and deserialize user
 passport.serializeUser((user, done) => {
   done(null, user);
 });
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (error) {
-    done(error, null);
-  }
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
 
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Cors
-const corsOptions = {
-  origin: ["http://127.0.0.1:5173", "http://localhost:3000"],
-};
-app.use(cors(corsOptions));
-
-// Middleware
+// Middleware for logging HTTP requests to the console
 app.use(morgan("dev"));
 
 // Bodyparser Middleware

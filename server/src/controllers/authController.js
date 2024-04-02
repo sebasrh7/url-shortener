@@ -1,6 +1,5 @@
 import passport from "passport";
 import dotenv from "dotenv";
-import User from "../models/User.js";
 dotenv.config();
 
 export const login = passport.authenticate("auth0", {
@@ -13,24 +12,19 @@ export const callback = passport.authenticate("auth0", {
 });
 
 export const logout = (req, res) => {
-  if (req.user) {
-    req.logout(() => {
-      res.redirect(process.env.CLIENT_URL);
-    });
-  } else {
-    res.redirect("/");
-  }
+  req.logout();
+  res.redirect(process.env.CLIENT_URL);
 };
 
 export const loginSuccess = (req, res) => {
+  console.log(req.session);
   if (req.user) {
-    return res.status(200).json({
-      message: "User has successfully logged in.",
-      user: req.user,
-    });
+    res
+      .status(200)
+      .json({ message: "User has successfully logged in.", user: req.user });
+  } else {
+    res.status(401).json({ message: "Not Authorized" });
   }
-
-  res.status(401).json({ message: "User failed to log in." });
 };
 
 export const loginFailure = (req, res) => {

@@ -31,14 +31,14 @@ router.get("/login", login);
 // Auth0 callback
 router.get("/callback", callback);
 
-// Auth0 login failure
-router.get("/login/failure", ensureAuthenticated, loginFailure);
+// Auth0 logout
+router.get("/logout", logout);
 
 // Auth0 login success
 router.get("/login/success", ensureAuthenticated, loginSuccess);
 
-// Auth0 logout
-router.get("/logout", logout);
+// Auth0 login failure
+router.get("/login/failure", ensureAuthenticated, loginFailure);
 
 // Routes for URL Shortener
 router.post("/shorten", validateSchema(urlSchema), createShortUrl); // Crear

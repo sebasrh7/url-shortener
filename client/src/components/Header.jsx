@@ -8,26 +8,26 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../api/axios";
+import Cookies from "js-cookie";
 
 const Header = () => {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const getUser = async () => {
-      console.log("getUser");
-      const response = axios.get(`${import.meta.env.VITE_API_URL}/login/success`, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        credentials: "include",
+  const getUser = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/login/success", {
+        withCredentials: true, // This is the important part for the cookies to be sent with the request to the server for authentication purposes
       });
-      const data = await response.json();
-      console.log("data", data.user);
-      setUser(data.user);
-    };
 
+      setUser(response.data.user);
+
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
     getUser();
   }, []);
 
@@ -45,25 +45,19 @@ const Header = () => {
         <Toolbar>
           <Avatar alt="Logo" src={logo} sx={{ mr: 2 }} />
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            URL Shortener {user ? `(${user.displayName})` : ""}
+            URL Shortener {
+              user && ` - Welcome, ${user.displayName}!`
+            
+            }
           </Typography>
-          {user ? (
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                alt={user.displayName}
-                src={user.picture}
-                sx={{ mr: 1 }}
-              />
-              <Typography sx={{ mr: 1 }}>{user.displayName}</Typography>
-              <Button variant="contained" onClick={logout}>
-                Logout
-              </Button>
-            </Box>
-          ) : (
-            <Button variant="contained" onClick={login}>
-              Login
-            </Button>
-          )}
+
+          {
+            user ? (
+              <Button color="inherit" onClick={logout}>Logout</Button>
+            ) : (
+              <Button color="inherit" onClick={login}>Login</Button>
+            )
+          }
         </Toolbar>
       </AppBar>
     </Box>
