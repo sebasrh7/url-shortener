@@ -2,7 +2,11 @@ import { Box, Typography } from "@mui/material";
 
 const Hero = () => {
   return (
-    <Box sx={{ marginTop: 20 }} textAlign="center">
+    <Box
+      textAlign="center"
+      className="flex flex-col items-center px-6 lg:pt-16 md:pt-12 pt-8"
+      component={"section"}
+    >
       <Typography variant="h2" gutterBottom>
         Shorten Your Loooong Urls :D
       </Typography>

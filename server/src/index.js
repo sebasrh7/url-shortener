@@ -83,8 +83,13 @@ passport.use(strategy);
 passport.serializeUser((user, done) => {
   done(null, user);
 });
-passport.deserializeUser((user, done) => {
-  done(null, user);
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
 });
 
 // Middleware for logging HTTP requests to the console

@@ -1,20 +1,31 @@
 import PropTypes from "prop-types";
-import { Box, TableCell, IconButton, TableRow } from "@mui/material";
+import { Box, TableCell, IconButton, TableRow, Avatar } from "@mui/material";
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   FileCopy as CopyIcon,
 } from "@mui/icons-material";
+import { copyToClipBoard } from "../../utils/copyToClipBoard";
 
 const TableRowComponent = ({ row, handleEdit, handleDelete, loading }) => {
   function getFaviconUrl(url) {
     if (!url) return "";
-    const googleFaviconUrl = `https://www.google.com/s2/favicons?sz=32&domain=${url}`;
+    const googleFaviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${url}`;
     return googleFaviconUrl;
   }
 
   return (
-    <TableRow hover tabIndex={-1} key={row.id}>
+    <TableRow
+      tabIndex={-1}
+      key={row.id}
+      sx={{
+        "&:last-child td, &:last-child th": { border: 0 },
+      }}
+      style={{
+        height: 73,
+      }}
+      className="hover:bg-gray-200 transition-colors duration-100 ease-in-out"
+    >
       <TableCell align="left">
         <Box
           component="div"
@@ -31,7 +42,10 @@ const TableRowComponent = ({ row, handleEdit, handleDelete, loading }) => {
           >
             {row.shortUrl}
           </a>
-          <IconButton onClick={() => {}} disabled={loading}>
+          <IconButton
+            onClick={() => copyToClipBoard(url.shortUrl)}
+            disabled={loading}
+          >
             <CopyIcon />
           </IconButton>
         </Box>
@@ -51,11 +65,10 @@ const TableRowComponent = ({ row, handleEdit, handleDelete, loading }) => {
             },
           }}
         >
-          <img
+          <Avatar
+            alt="Favicon"
             src={getFaviconUrl(row.originalUrl)}
-            alt="favicon"
-            loading={"eager"}
-            className="w-6 h-6 aspect-square"
+            sx={{ width: 24, height: 24, mr: 1, loading: "eager" }}
           />
           <span className="ml-4 overflow-ellipsis overflow-hidden whitespace-nowrap">
             {row.originalUrl}
@@ -63,14 +76,17 @@ const TableRowComponent = ({ row, handleEdit, handleDelete, loading }) => {
         </Box>
       </TableCell>
       <TableCell align="left">{row.clicks}</TableCell>
+      <TableCell align="left">{row.qrCode}</TableCell>
       <TableCell align="left">{row.date}</TableCell>
       <TableCell align="left" sx={{ width: "120px" }}>
-        <IconButton onClick={() => handleEdit(row.id)} disabled={loading}>
-          <EditIcon />
-        </IconButton>
-        <IconButton onClick={() => handleDelete(row.id)} disabled={loading}>
-          <DeleteIcon />
-        </IconButton>
+        <Box component="div" sx={{ display: "flex" }}>
+          <IconButton onClick={() => handleEdit(row.id)} disabled={loading}>
+            <EditIcon />
+          </IconButton>
+          <IconButton onClick={() => handleDelete(row.id)} disabled={loading}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
       </TableCell>
     </TableRow>
   );

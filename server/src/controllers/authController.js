@@ -1,5 +1,7 @@
 import passport from "passport";
 import dotenv from "dotenv";
+import User from "../models/User.js";
+import Url from "../models/Url.js";
 dotenv.config();
 
 export const login = passport.authenticate("auth0", {
@@ -17,7 +19,6 @@ export const logout = (req, res) => {
 };
 
 export const loginSuccess = (req, res) => {
-  console.log(req.session);
   if (req.user) {
     res
       .status(200)
@@ -29,4 +30,15 @@ export const loginSuccess = (req, res) => {
 
 export const loginFailure = (req, res) => {
   res.status(401).json({ message: "User failed to log in." });
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    await Url.deleteMany({ user: req.user._id }); // Delete all urls created by user
+    await User.findByIdAndDelete(req.user._id); // Delete user account
+    req.logout();
+    res.status(200).json({ message: "User account has been deleted." });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete user account." });
+  }
 };

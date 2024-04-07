@@ -1,18 +1,18 @@
 import { createContext, useState } from "react";
 import {
-  shorten,
-  getUrls,
-  deleteUrl,
-  getUrl,
-  updateUrl,
-} from "../services/urlApi";
+    guestShorten,
+    guestGetUrls,
+    guestDeleteSelected,
+    guestGetUrl,
+    guestDeleteUrl
+} from "../services/guestApi";
 import { copyToClipBoard } from "../utils/copyToClipBoard";
 
 // Se crea el contexto
-export const UrlContext = createContext();
+export const GuestContext = createContext();
 
 // Se provee el contexto
-export const UrlProvider = ({ children }) => {
+export const GuestProvider = ({ children }) => {
   // Se inicializa el estado
   const [url, setUrl] = useState(""); // estado para almacenar la URL acortada
   const [allUrls, setAllUrls] = useState([]); // estado para almacenar todas las URL
@@ -20,8 +20,9 @@ export const UrlProvider = ({ children }) => {
   const [message, setMessage] = useState(""); // estado para almacenar el mensaje
 
   // Se crea la función para acortar la URL
-  const shortenUrl = async (url) => {
-    const data = await shorten(url);
+  const guestShortenUrl = async (url) => {
+    const data = await guestShorten(url);
+    console.log(data);
     if (!data.error) {
       setError("");
       setUrl(data.shortUrl);
@@ -30,24 +31,21 @@ export const UrlProvider = ({ children }) => {
         const newUrl = {
           _id: data._id,
           originalUrl: data.originalUrl,
-          shortUrlId: data.shortUrl,
-          clicks: data.clicks,
+          shortUrlId: data.shortUrlId,
+          shortUrl: data.shortUrl,
           date: data.date,
         };
-
         copyToClipBoard(data.shortUrl);
-        
         setAllUrls([...allUrls, newUrl]);
       }
       return;
     }
-
     setError(data.error);
   };
 
   // se crea la función para obtener las URL
-  const getAllUrls = async () => {
-    const data = await getUrls();
+  const getGuestAllUrls = async () => {
+    const data = await guestGetUrls();
     if (data) {
       setAllUrls(data);
       return;
@@ -58,8 +56,8 @@ export const UrlProvider = ({ children }) => {
   };
 
   // se crea la función para eliminar una URL
-  const deleteAUrl = async (id) => {
-    const data = await deleteUrl(id);
+  const deleteGuestAUrl = async (id) => {
+    const data = await guestDeleteUrl(id);
     if (data) {
       setAllUrls(allUrls.filter((url) => url._id !== id));
       setMessage(data.message);
@@ -70,8 +68,8 @@ export const UrlProvider = ({ children }) => {
     }
   };
 
-  const getAUrl = async (id) => {
-    const data = await getUrl(id);
+  const getGuestAUrl = async (id) => {
+    const data = await guestGetUrl(id);
     if (data) {
       return data;
     } else {
@@ -80,36 +78,21 @@ export const UrlProvider = ({ children }) => {
     }
   };
 
-  const editAUrl = async (editedUrl, id) => {
-    const data = await updateUrl(editedUrl, id);
-    if (data) {
-      setAllUrls(
-        allUrls.map((url) => (url._id === id ? { ...url, ...editedUrl } : url))
-      );
-      setMessage(data.message);
-      return;
-    } else {
-      console.log(data.error);
-      return;
-    }
-  };
 
   return (
-    <UrlContext.Provider
+    <GuestContext.Provider
       value={{
         url,
-        setUrl,
         allUrls,
-        message,
         error,
-        shortenUrl,
-        getAllUrls,
-        deleteAUrl,
-        getAUrl,
-        editAUrl,
+        message,
+        guestShortenUrl,
+        getGuestAllUrls,
+        deleteGuestAUrl,
+        getGuestAUrl,
       }}
     >
       {children}
-    </UrlContext.Provider>
+    </GuestContext.Provider>
   );
 };

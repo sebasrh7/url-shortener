@@ -8,19 +8,27 @@ import {
   TableRow,
   TableContainer,
   TablePagination,
+  Button,
+  Tab,
 } from "@mui/material";
 import { useUrl } from "../../hook/useUrl";
 import TableHeader from "./TableHeader";
 import TableRowComponent from "./TableRow";
 import TableToolbar from "./TableToolbar";
 import { useTableSorting } from "../../hook/useTableSorting";
+import { formatDate } from "../../utils/formatDate";
+import QRCode from "react-qr-code";
+import EditForm from "../editForm/EditForm";
 
 const UrlTable = () => {
   // Obtiene la lista de todas las URL y la función para obtener todas las URL
-  const { allUrls, getAllUrls, deleteAUrl, getAUrl } = useUrl();
+  const { allUrls, getAllUrls, deleteAUrl, getAUrl, editAUrl } = useUrl();
 
   // Obtiene el orden y la columna por la que se ordena, y las funciones para establecer el orden y la columna por la que se ordena
   const { order, orderBy, handleRequestSort } = useTableSorting("desc", "date");
+
+  // Estado para la paginación
+  const [editingUrl, setEditingUrl] = useState(null);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -45,8 +53,9 @@ const UrlTable = () => {
       id: urlData._id,
       shortUrl: urlData.shortUrlId,
       originalUrl: urlData.originalUrl,
+      qrCode: <QRCode value={urlData.originalUrl} size={36} />,
       clicks: urlData.clicks,
-      date: new Date(urlData.date).toLocaleDateString(),
+      date: formatDate(urlData.date),
     };
   }
 
@@ -98,69 +107,131 @@ const UrlTable = () => {
   };
 
   const handleDelete = async (id) => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    // Elimina la URL con el ID dado
-    await deleteAUrl(id);
+      // Elimina la URL con el ID dado
+      await deleteAUrl(id);
 
-    setLoading(false);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
   };
 
   const handleEdit = async (id) => {
-    // Lógica para editar la fila con el ID dado
-    console.log(`Editar fila con ID: ${id}`);
+    const data = await getAUrl(id);
+    if (data) {
+      setEditingUrl(data);
+    } else {
+      console.log("Error al obtener los detalles de la URL");
+    }
+  };
 
-    const url = await getAUrl(id);
-    console.log(url);
+  const handleSaveEdit = async (data) => {
+    try {
+      setLoading(true);
+      await editAUrl(data, editingUrl._id);
+      setLoading(false);
+      setEditingUrl(null);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUrl(null);
+  };
+
+  const handleCreateUrlClick = () => {
+    const selectTextField = document.getElementById("originalUrl");
+
+    if (selectTextField) {
+      selectTextField.focus();
+    }
   };
 
   return (
-    <Box sx={{ width: "90%", marginX: "auto", marginY: 2 }}>
-      <Paper sx={{ width: "100%" }}>
-        <TableToolbar />
-        <TableContainer>
-          <Table>
-            <TableHeader
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              headCells={[
-                { id: "shortUrl", label: "Short Url" },
-                { id: "originalUrl", label: "Original Url" },
-                { id: "clicks", label: "Clicks" },
-                { id: "date", label: "Date" },
-                { id: "action", label: "Action" },
-              ]}
-            />
-            <TableBody>
-              {visibleRows.map((row) => (
-                <TableRowComponent
-                  key={row.id}
-                  row={row}
-                  handleEdit={handleEdit}
-                  handleDelete={handleDelete}
-                  loading={loading}
-                />
-              ))}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 73 * emptyRows }}>
-                  <TableCell colSpan={5} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+    <>
+      {editingUrl && (
+        <EditForm
+          initialData={editingUrl}
+          onSave={handleSaveEdit}
+          onCancel={handleCancelEdit}
         />
-      </Paper>
-    </Box>
+      )}
+      <Box sx={{ width: "90%", marginX: "auto", marginY: 2 }}>
+        <Paper sx={{ width: "100%" }}>
+          <TableToolbar />
+          <TableContainer>
+            <Table>
+              <TableHeader
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+                headCells={[
+                  { id: "shortUrl", label: "Short Url" },
+                  { id: "originalUrl", label: "Original Url" },
+                  { id: "clicks", label: "Clicks" },
+                  { id: "qrCode", label: "QR Code" },
+                  { id: "date", label: "Date" },
+                  { id: "action", label: "Action" },
+                ]}
+              />
+              {rows.length > 0 ? (
+                <TableBody>
+                  {visibleRows.map((row) => (
+                    <TableRowComponent
+                      key={row.id}
+                      row={row}
+                      handleEdit={handleEdit}
+                      handleDelete={handleDelete}
+                      loading={loading}
+                    />
+                  ))}
+                  {emptyRows > 0 && (
+                    <TableRow
+                      style={{ height: 73 * emptyRows }}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )}
+                </TableBody>
+              ) : (
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      You don't have any URLs yet. Create one now!
+                      <Box display="flex" justifyContent="center" mt={2}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleCreateUrlClick}
+                        >
+                          Create URL
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              )}
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      </Box>
+    </>
   );
 };
 

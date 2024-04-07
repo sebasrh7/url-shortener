@@ -1,6 +1,8 @@
-export const ensureAuthenticated = (req, res, next) => {
+export const authRequeride = (req, res, next) => {
   if (req.isAuthenticated()) {
-    return next();
+    next();
+  } else {
+    res.sessionID;
+    next();
   }
-  res.json({ message: "Not Authorized" });
 };

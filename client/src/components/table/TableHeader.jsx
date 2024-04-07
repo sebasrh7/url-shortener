@@ -17,7 +17,7 @@ const TableHeader = ({ order, orderBy, onRequestSort, headCells }) => {
             padding="normal"
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            {headCell.id !== "action" ? (
+            {headCell.id !== "action" && headCell.id !== "qrCode" ? (
               <TableSortLabel
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : "asc"}
