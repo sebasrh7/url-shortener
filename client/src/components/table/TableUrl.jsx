@@ -9,7 +9,7 @@ import {
   TableContainer,
   TablePagination,
   Button,
-  Tab,
+  Container,
 } from "@mui/material";
 import { useUrl } from "../../hook/useUrl";
 import TableHeader from "./TableHeader";
@@ -30,6 +30,7 @@ const UrlTable = () => {
   // Estado para la paginación
   const [editingUrl, setEditingUrl] = useState(null);
 
+  // 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loading, setLoading] = useState(false);
@@ -154,7 +155,7 @@ const UrlTable = () => {
   };
 
   return (
-    <>
+    <Container className="flex-grow">
       {editingUrl && (
         <EditForm
           initialData={editingUrl}
@@ -162,7 +163,7 @@ const UrlTable = () => {
           onCancel={handleCancelEdit}
         />
       )}
-      <Box sx={{ width: "90%", marginX: "auto", marginY: 2 }}>
+      <Box sx={{ width: "100%", marginX: "auto" }}>
         <Paper sx={{ width: "100%" }}>
           <TableToolbar />
           <TableContainer>
@@ -231,7 +232,7 @@ const UrlTable = () => {
           />
         </Paper>
       </Box>
-    </>
+    </Container>
   );
 };
 

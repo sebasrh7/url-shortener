@@ -6,46 +6,69 @@ import {
   Button,
   Toolbar,
   Typography,
+  Container,
 } from "@mui/material";
 import { useAuth } from "../../hook/useAuth";
 import Shortener from "../shortener/Shortener";
 import AccountMenu from "../acountMenu/AcountMenu";
+import {SwitchAutoCopy} from "../switch/SwitchAutoCopy";
+
+const label = { inputProps: { "aria-label": "Switch demo" } };
 
 const Header = () => {
   const { login, isAuthenticated } = useAuth();
   return (
-    <AppBar position="static">
+    <AppBar position="static" color="transparent" elevation={0}>
       {isAuthenticated ? (
-        <Toolbar
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginY: "4px",
-            flexGrow: 1,
-          }}
-        >
-          <Box display="flex" alignItems="center">
-            <Avatar alt="Logo" src={logo} sx={{ mr: 2 }} />
-            <Typography variant="h6" component="div" >
-              URL Shortener
-            </Typography>
-          </Box>
+        <Toolbar style={{ padding: "2rem 0" }}>
+          <Container>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Box display="flex" alignItems="center">
+                <Avatar alt="Logo" src={logo} sx={{ mr: 2 }} />
+                <Typography variant="h6" component="div">
+                  URL Shortener
+                </Typography>
+              </Box>
 
-          <Shortener />
+              <Shortener />
+              <AccountMenu />
+            </Box>
 
-          <AccountMenu />
-
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 2,
+              }}
+            >
+              <SwitchAutoCopy />
+            </Box>
+          </Container>
         </Toolbar>
       ) : (
-        <Toolbar>
-          <Avatar alt="Logo" src={logo} sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            URL Shortener
-          </Typography>
-          <Button color="inherit" onClick={login}>
-            Login
-          </Button>
+        <Toolbar style={{ padding: "2rem 0" }}>
+          <Container
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Avatar alt="Logo" src={logo} sx={{ mr: 2 }} />
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              URL Shortener
+            </Typography>
+            <Button variant="outlined" color="primary" onClick={login}>
+              Login
+            </Button>
+          </Container>
         </Toolbar>
       )}
     </AppBar>

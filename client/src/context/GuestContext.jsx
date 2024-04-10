@@ -1,10 +1,10 @@
 import { createContext, useState } from "react";
 import {
-    guestShorten,
-    guestGetUrls,
-    guestDeleteSelected,
-    guestGetUrl,
-    guestDeleteUrl
+  guestShorten,
+  guestGetUrls,
+  guestDeleteSelected,
+  guestGetUrl,
+  guestDeleteUrl,
 } from "../services/guestApi";
 import { copyToClipBoard } from "../utils/copyToClipBoard";
 
@@ -18,15 +18,25 @@ export const GuestProvider = ({ children }) => {
   const [allUrls, setAllUrls] = useState([]); // estado para almacenar todas las URL
   const [error, setError] = useState(""); // estado para almacenar el error
   const [message, setMessage] = useState(""); // estado para almacenar el mensaje
+  // incializa segun el local storage si el switch esta activado o no,     // si no hay nada en el local storage, se inicializa en true
+  const [checked, setChecked] = useState(
+    localStorage.getItem("checked") === null
+      ? true
+      : localStorage.getItem("checked") === "true"
+  );
 
   // Se crea la función para acortar la URL
   const guestShortenUrl = async (url) => {
     const data = await guestShorten(url);
-    console.log(data);
     if (!data.error) {
       setError("");
       setUrl(data.shortUrl);
       setMessage(data.message);
+      if (checked) {
+        copyToClipBoard(data.shortUrl);
+      } else {
+        copyToClipBoard('');
+      }
       if (data.message != "URL already exists") {
         const newUrl = {
           _id: data._id,
@@ -35,7 +45,6 @@ export const GuestProvider = ({ children }) => {
           shortUrl: data.shortUrl,
           date: data.date,
         };
-        copyToClipBoard(data.shortUrl);
         setAllUrls([...allUrls, newUrl]);
       }
       return;
@@ -78,7 +87,6 @@ export const GuestProvider = ({ children }) => {
     }
   };
 
-
   return (
     <GuestContext.Provider
       value={{
@@ -86,6 +94,8 @@ export const GuestProvider = ({ children }) => {
         allUrls,
         error,
         message,
+        checked,
+        setChecked,
         guestShortenUrl,
         getGuestAllUrls,
         deleteGuestAUrl,

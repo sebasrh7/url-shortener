@@ -1,10 +1,17 @@
-import { InputAdornment, TextField, Button } from "@mui/material";
+import {
+  InputAdornment,
+  TextField,
+  Button,
+  Box,
+  Typography,
+} from "@mui/material";
 import { Link } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { useUrl } from "../../hook/useUrl";
 import { useAuth } from "../../hook/useAuth";
 import { useGuest } from "../../hook/useGuest";
 import { useState } from "react";
+
 const Shortener = () => {
   const { shortenUrl } = useUrl(); // Se obtiene el estado y la función del contexto
   const { guestShortenUrl } = useGuest(); // Se obtiene el estado y la función del contexto
@@ -42,7 +49,7 @@ const Shortener = () => {
           onSubmit={handleSubmit(onSubmit)}
           style={{ flex: 1, padding: "0 1rem" }}
         >
-          <div className="max-w-4xl mx-auto">
+          <Box className="max-w-4xl mx-auto">
             <TextField
               id="originalUrl"
               label="Enter your URL here"
@@ -70,40 +77,43 @@ const Shortener = () => {
                 ),
               }}
             />
-          </div>
+          </Box>
         </form>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} style={{ margin: "2rem 0" }}>
-          <div className="max-w-2xl mx-auto">
-            <TextField
-              id="originalUrl"
-              label="Enter your URL here"
-              placeholder="https://example.com"
-              variant="filled"
-              fullWidth
-              {...register("originalUrl", { required: "URL is required" })}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Link color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      disabled={loading}
-                    >
-                      Shorten
-                    </Button>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </div>
-        </form>
+        <Box className="flex flex-col items-center justify-center">
+          <form onSubmit={handleSubmit(onSubmit)} className="pt-8 pb-4 w-full">
+            <div className="max-w-2xl mx-auto">
+              <TextField
+                id="originalUrl"
+                label="Enter your URL here"
+                placeholder="https://example.com"
+                variant="filled"
+                fullWidth
+                {...register("originalUrl", { required: "URL is required" })}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Link color="action" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        disabled={loading}
+                      >
+                        Shorten
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </div>
+          </form>
+          
+        </Box>
       )}
     </>
   );

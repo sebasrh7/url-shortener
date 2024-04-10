@@ -1,9 +1,9 @@
-import { Typography, Link } from "@mui/material";
+import { Typography, Container, Link } from "@mui/material";
 
 const Footer = () => {
   return (
-    <footer className="mt-auto w-full text-sm  py-4">
-      <div className="px-4 flex justify-between items-center">
+    <footer className="py-4 mt-8">
+      <Container sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="body2" color="textSecondary">
           <Link
             href="https://material-ui.com/"
@@ -33,7 +33,7 @@ const Footer = () => {
             @sebasrh7
           </Link>
         </Typography>
-      </div>
+      </Container>
     </footer>
   );
 };

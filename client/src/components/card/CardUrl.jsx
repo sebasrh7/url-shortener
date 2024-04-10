@@ -4,6 +4,7 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import {
   Delete as DeleteIcon,
@@ -11,7 +12,7 @@ import {
 } from "@mui/icons-material";
 import { formatDate } from "../../utils/formatDate";
 import { copyToClipBoard } from "../../utils/copyToClipBoard";
-
+import { getFaviconIcon } from "../../utils/getFaviconIcon";
 export const CardUrl = () => {
   const { allUrls, getGuestAllUrls, deleteGuestAUrl } = useGuest(); // Se obtiene el estado del contexto
 
@@ -28,8 +29,8 @@ export const CardUrl = () => {
 
   return (
     <>
-      <Container>
-        <Grid container spacing={2}>
+      <Container className="flex-grow">
+        <Grid container spacing={1}>
           {allUrls.map((url) => (
             <Grid item xs={12} sm={6} md={4} key={url._id}>
               <Paper className="p-3">
@@ -54,16 +55,21 @@ export const CardUrl = () => {
                     </IconButton>
                   </Box>
                 </Box>
-                <Box>
+                <Box className="flex align-center space-x-1 mt-2">
+                  <Avatar
+                    alt="Favicon"
+                    src={getFaviconIcon(url.originalUrl)}
+                    sx={{ width: 24, height: 24, mr: 1, loading: "eager" }}
+                  />
                   <p
-                    className="mb-2 truncate text-sm text-neutral-500 dark:text-neutral-400"
-                    title="a"
+                    className=" truncate text-sm text-neutral-500 dark:text-neutral-400"
+                    title={url.originalUrl}
                   >
                     {url.originalUrl}
                   </p>
                 </Box>
                 <Box>
-                  <div className="flex items-center justify-start text-xs font-medium text-neutral-600 dark:text-neutral-400 md:space-x-2">
+                  <div className="flex items-center justify-end text-xs font-medium text-neutral-600 dark:text-neutral-400 md:space-x-2">
                     <p>{formatDate(url.date)}</p>
                   </div>
                 </Box>

@@ -6,14 +6,9 @@ import {
   FileCopy as CopyIcon,
 } from "@mui/icons-material";
 import { copyToClipBoard } from "../../utils/copyToClipBoard";
+import { getFaviconIcon } from "../../utils/getFaviconIcon";
 
 const TableRowComponent = ({ row, handleEdit, handleDelete, loading }) => {
-  function getFaviconUrl(url) {
-    if (!url) return "";
-    const googleFaviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${url}`;
-    return googleFaviconUrl;
-  }
-
   return (
     <TableRow
       tabIndex={-1}
@@ -67,7 +62,7 @@ const TableRowComponent = ({ row, handleEdit, handleDelete, loading }) => {
         >
           <Avatar
             alt="Favicon"
-            src={getFaviconUrl(row.originalUrl)}
+            src={getFaviconIcon(row.originalUrl)}
             sx={{ width: 24, height: 24, mr: 1, loading: "eager" }}
           />
           <span className="ml-4 overflow-ellipsis overflow-hidden whitespace-nowrap">

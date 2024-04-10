@@ -19,6 +19,12 @@ export const UrlProvider = ({ children }) => {
   const [error, setError] = useState(""); // estado para almacenar el error
   const [message, setMessage] = useState(""); // estado para almacenar el mensaje
 
+  const [checked, setChecked] = useState(
+    localStorage.getItem("checked") === null
+      ? true
+      : localStorage.getItem("checked") === "true"
+  );
+
   // Se crea la función para acortar la URL
   const shortenUrl = async (url) => {
     const data = await shorten(url);
@@ -26,6 +32,11 @@ export const UrlProvider = ({ children }) => {
       setError("");
       setUrl(data.shortUrl);
       setMessage(data.message);
+      if (checked) {
+        copyToClipBoard(data.shortUrl);
+      } else {
+        copyToClipBoard('');
+      }
       if (data.message != "URL already exists") {
         const newUrl = {
           _id: data._id,
@@ -34,8 +45,6 @@ export const UrlProvider = ({ children }) => {
           clicks: data.clicks,
           date: data.date,
         };
-
-        copyToClipBoard(data.shortUrl);
         
         setAllUrls([...allUrls, newUrl]);
       }
@@ -102,6 +111,8 @@ export const UrlProvider = ({ children }) => {
         allUrls,
         message,
         error,
+        checked,
+        setChecked,
         shortenUrl,
         getAllUrls,
         deleteAUrl,

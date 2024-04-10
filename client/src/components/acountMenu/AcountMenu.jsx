@@ -1,4 +1,3 @@
-import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -10,12 +9,13 @@ import Delete from "@mui/icons-material/Delete";
 import { DarkMode } from "@mui/icons-material";
 import { LightMode } from "@mui/icons-material";
 import { useAuth } from "../../hook/useAuth";
+import { useState } from "react";
 
 export default function AccountMenu() {
   const { user, logout, deleteProfile } = useAuth();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [theme, setTheme] = React.useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [theme, setTheme] = useState(true);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -35,7 +35,7 @@ export default function AccountMenu() {
     localStorage.setItem("theme", !theme);
   };
   return (
-    <React.Fragment>
+    <>
       <IconButton
         onClick={handleClick}
         aria-controls={open ? "account-menu" : undefined}
@@ -118,6 +118,6 @@ export default function AccountMenu() {
           Delete Account
         </MenuItem>
       </Menu>
-    </React.Fragment>
+    </>
   );
 }
